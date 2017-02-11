@@ -9,6 +9,11 @@
 import UIKit
 import MBProgressHUD
 
+protocol SettingsPresentingViewControllerDelegate: class {
+    func didSaveSettings(settings: GithubRepoSearchSettings)
+    func didCancelSettings()
+}
+
 // Main ViewController
 class RepoResultsViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
 
@@ -77,6 +82,14 @@ class RepoResultsViewController: UIViewController, UITableViewDataSource, UITabl
         
         return cell
     }
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        let navController = segue.destination as! UINavigationController
+        let vc = navController.topViewController as! SearchSettingsViewController
+        
+        vc.delegate = self
+        vc.settings = self.searchSettings
+    }
 
 }
 
@@ -101,6 +114,17 @@ extension RepoResultsViewController: UISearchBarDelegate {
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
         searchSettings.searchString = searchBar.text
         searchBar.resignFirstResponder()
+        doSearch()
+    }
+}
+
+extension RepoResultsViewController: SettingsPresentingViewControllerDelegate {
+    func didCancelSettings() {
+        
+    }
+
+    func didSaveSettings(settings: GithubRepoSearchSettings) {
+        self.searchSettings = settings
         doSearch()
     }
 }
